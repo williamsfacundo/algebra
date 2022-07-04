@@ -4,12 +4,12 @@ namespace Williams
 {
     namespace Quat 
     {
-        public class Quaternion 
+        public struct Quaternion 
         {
-            private float _x;
-            private float _y;
-            private float _z;
-            private float _w;
+            public float _x;
+            public float _y;
+            public float _z;
+            public float _w;
 
             public Quaternion(float x, float y, float z, float w) 
             {
@@ -19,70 +19,60 @@ namespace Williams
                 _w = w;
             }
 
-            public static Quaternion identity //NO TERMINADO
+            public static Quaternion identity
             {
                 get 
                 {
-                    return new Quaternion(0f, 0f, 0f, 0f); 
+                    return new Quaternion(0f, 0f, 0f, 1f); 
                 } 
-            }
-            
-            public Vector3 eulerAngles //NO TERMINADO
-            {
-                set 
-                {
+            }       
 
-                }
-                get 
-                {
-                    return new Vector3();
-                }
-            }
-            
-            public Quaternion normalized //NO TERMINADO
+            public static Quaternion Euler(Vector3 euler) 
             {
-                get 
-                {
-                    return new Quaternion(0f, 0f, 0f, 0f);
-                }
-            }
+                float cz = Mathf.Cos(Mathf.Deg2Rad * euler.z / 2);
+                float sz = Mathf.Sin(Mathf.Deg2Rad * euler.z / 2);
+                float cy = Mathf.Cos(Mathf.Deg2Rad * euler.y / 2);
+                float sy = Mathf.Sin(Mathf.Deg2Rad * euler.y / 2);
+                float cx = Mathf.Cos(Mathf.Deg2Rad * euler.x / 2);
+                float sx = Mathf.Sin(Mathf.Deg2Rad * euler.x / 2);
 
-            public static Quaternion Euler(Vector3 euler) //NO TERMINADO 
-            {
-                return new Quaternion(0f, 0f, 0f, 0f);
+                Quaternion q = Quaternion.identity;
+
+                q._w = cx * cy * cz + sx * sy * sz;   
+                q._x = sx * cy * cz - cx * sy * sz;   
+                q._y = cx * sy * cz + sx * cy * sz;   
+                q._z = cx * cy * sz - sx * sy * cz;   
+
+                return q;
             }
 
-            public static Quaternion FromToRotation(Vector3 fromDirection, Vector3 toDirection) //NO TERMINADO
+            private static Vector3 ToEulerAngles(Quaternion q)
             {
-                return new Quaternion(0f, 0f, 0f, 0f);
-            }
-            
-            public static Quaternion Inverse(Quaternion rotation) //NO TERMINADO
-            {
-                return new Quaternion(0f, 0f, 0f, 0f);
+                Vector3 angles;
+
+                float sinr_cosp = 2 * (q._w * q._x + q._y * q._z);
+                float cosr_cosp = 1 - 2 * (q._x * q._x + q._y * q._y);
+                angles.x = Mathf.Atan2(sinr_cosp, cosr_cosp);
+                
+                float sinp = 2 * (q._w * q._y - q._z * q._x);
+                if (Mathf.Abs(sinp) >= 1)
+                    angles.y = (Mathf.PI / 2) * Mathf.Sign(sinp);
+                else
+                    angles.y = Mathf.Asin(sinp);
+                                
+                float siny_cosp = 2 * (q._w * q._z + q._x * q._y);
+                float cosy_cosp = 1 - 2 * (q._y * q._y + q._z * q._z);
+                angles.z = Mathf.Atan2(siny_cosp, cosy_cosp);
+
+                return angles;
             }
 
-            public static Quaternion Lerp(Quaternion a, Quaternion b, float t) //NO TERMINADO 
+            public static Quaternion Inverse(Quaternion q) 
             {
-                return new Quaternion(0f, 0f, 0f, 0f);
-            }
+                return new Quaternion(-q._x, -q._y, -q._z, q._w);
+            }                                                
 
-            public static Quaternion Normalize(Quaternion q) //NO TERMINADO
-            {
-                return new Quaternion(0f, 0f, 0f, 0f);
-            }
-
-            public static Quaternion Slerp(Quaternion a, Quaternion b, float t) //NO TERMINADO
-            {
-                return new Quaternion(0f, 0f, 0f, 0f);
-            }
-
-            public static Vector3 ToEulerAngles(Quaternion rotation) //NO TERMINADO 
-            {
-                return new Vector3();
-            }
-
-            public override string ToString() //NO TERMINADO
+            public override string ToString()
             {
                 return base.ToString();
             }
@@ -95,16 +85,16 @@ namespace Williams
             public override int GetHashCode()
             {
                 return base.GetHashCode();
-            }
+            }            
 
-            public static Vector3 operator *(Quaternion rotation, Vector3 point) //NO TERMINADO
+            public static Quaternion operator *(Quaternion q1, Quaternion q2)
             {
-                return Vector3.zero;
-            }
+                float w = q1._w * q2._w - q1._x * q2._x - q1._y * q1._y - q1._z * q2._z;
+                float x = q1._w * q2._x + q1._x * q2._w - q1._y * q2._z - q1._z * q2._y;
+                float y = q1._w * q2._y - q1._x * q2._z + q1._y * q2._w + q1._z * q2._x;
+                float z = q1._w * q2._z + q1._x * q2._y - q1._y * q2._x + q1._z * q2._w;
 
-            public static Quaternion operator *(Quaternion lhs, Quaternion rhs) //NO TERMINADO
-            {
-                return new Quaternion(0f, 0f, 0f, 0f);
+                return new Quaternion(x, y, z, w);
             }
 
             public static bool operator ==(Quaternion lhs, Quaternion rhs) //NO TERMINADO 

@@ -119,8 +119,7 @@ namespace Williams
             {
                 get
                 {
-                    return GetRotation();
-                   
+                    return GetRotation();                  
                 }
             }
 
