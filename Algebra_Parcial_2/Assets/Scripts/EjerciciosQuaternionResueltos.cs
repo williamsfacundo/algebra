@@ -50,30 +50,67 @@ public class EjerciciosQuaternionResueltos : MonoBehaviour
             _auxEjercicio = _ejercicioQuaternion;
 
             ValorInicialDeLosVectores();
+
+            Vector3Debugger.TurnOffVector(vector1Name);
+            Vector3Debugger.DisableEditorView(vector1Name);
+
+            Vector3Debugger.TurnOffVector(vector2Name);
+            Vector3Debugger.DisableEditorView(vector2Name);
+
+            Vector3Debugger.TurnOffVector(vector3Name);
+            Vector3Debugger.DisableEditorView(vector3Name);
+
+            Vector3Debugger.TurnOffVector(vector4Name);
+            Vector3Debugger.DisableEditorView(vector4Name);
+
+            switch (_ejercicioQuaternion) 
+            {
+                case 1:
+
+                    Vector3Debugger.TurnOnVector(vector1Name);
+                    Vector3Debugger.EnableEditorView(vector1Name);
+
+                    break;
+                case 2:
+
+                    Vector3Debugger.TurnOnVector(vector1Name);
+                    Vector3Debugger.EnableEditorView(vector1Name);
+
+                    Vector3Debugger.TurnOnVector(vector2Name);
+                    Vector3Debugger.EnableEditorView(vector2Name);
+
+                    Vector3Debugger.TurnOnVector(vector3Name);
+                    Vector3Debugger.EnableEditorView(vector3Name);
+
+                    break;
+                case 3:
+
+                    Vector3Debugger.TurnOnVector(vector1Name);
+                    Vector3Debugger.EnableEditorView(vector1Name);
+
+                    Vector3Debugger.TurnOnVector(vector2Name);
+                    Vector3Debugger.EnableEditorView(vector2Name);
+
+                    Vector3Debugger.TurnOnVector(vector3Name);
+                    Vector3Debugger.EnableEditorView(vector3Name);
+
+                    Vector3Debugger.TurnOnVector(vector4Name);
+                    Vector3Debugger.EnableEditorView(vector4Name);
+
+                    break;
+            }
         }
     }
 
     // Update is called once per frame
     private void FixedUpdate()
     {
-        Vector3Debugger.TurnOffVector(vector1Name);
-        Vector3Debugger.DisableEditorView(vector1Name);
-
-        Vector3Debugger.TurnOffVector(vector2Name);
-        Vector3Debugger.DisableEditorView(vector2Name);
-
-        Vector3Debugger.TurnOffVector(vector3Name);
-        Vector3Debugger.DisableEditorView(vector3Name);
-
-        Vector3Debugger.TurnOffVector(vector4Name);
-        Vector3Debugger.DisableEditorView(vector4Name);
-
         switch (_ejercicioQuaternion) 
         {
             case 1:
 
-                EjercicioUno();
- 
+                EjercicioUno();                
+
                 break;
 
             case 2:
@@ -100,9 +137,6 @@ public class EjerciciosQuaternionResueltos : MonoBehaviour
 
     private void EjercicioUno() 
     {
-        Vector3Debugger.TurnOnVector(vector1Name);
-        Vector3Debugger.EnableEditorView(vector1Name);
-
         vector1 = Quaternion.Euler(new Vector3(0f, angle, 0f)) * vector1;
 
         Vector3Debugger.UpdatePosition(vector1Name, vector1);
@@ -110,18 +144,9 @@ public class EjerciciosQuaternionResueltos : MonoBehaviour
 
     private void EjercicioDos() 
     {
-        Vector3Debugger.TurnOnVector(vector1Name);
-        Vector3Debugger.EnableEditorView(vector1Name);
-
-        Vector3Debugger.TurnOnVector(vector2Name);
-        Vector3Debugger.EnableEditorView(vector2Name);
-
-        Vector3Debugger.TurnOnVector(vector3Name);
-        Vector3Debugger.EnableEditorView(vector3Name);
-
         vector1 = Quaternion.Euler(new Vector3(0, angle, 0)) * vector1;
-        vector2 = Quaternion.Euler(new Vector3(0, angle, 0)) * vector1;
-        vector3 = Quaternion.Euler(new Vector3(0, angle, 0)) * vector1;
+        vector2 = Quaternion.Euler(new Vector3(0, angle, 0)) * vector2;
+        vector3 = Quaternion.Euler(new Vector3(0, angle, 0)) * vector3;
 
         Vector3Debugger.UpdatePosition(vector1Name, vector1);
         Vector3Debugger.UpdatePosition(vector2Name, vector1, vector2);
@@ -130,6 +155,9 @@ public class EjerciciosQuaternionResueltos : MonoBehaviour
 
     private void EjercicioTres() 
     {
-        
+        Vector3Debugger.UpdatePosition(vector1Name, vector1);
+        Vector3Debugger.UpdatePosition(vector2Name, vector1, vector2);
+        Vector3Debugger.UpdatePosition(vector3Name, vector2, vector3);
+        Vector3Debugger.UpdatePosition(vector4Name, vector3, vector4);
     }
 }
