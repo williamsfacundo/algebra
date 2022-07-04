@@ -4,15 +4,15 @@ namespace Williams
 {
     namespace Matrix 
     {
-        public class Matrix
+        public struct Matrix
         {
             private const short maxMatrixValues = 16;
             private const short maxRows = 4;
             private const short maxColumns = 4;
 
-            private float[] _matrixValuesAsArray1D = new float[maxMatrixValues];
+            private float[] _matrixValuesAsArray1D;
 
-            private float[,] _matrixValuesAsArray2D = new float[maxRows, maxColumns];
+            private float[,] _matrixValuesAsArray2D;
 
             //Row 1
             private float _m00;
@@ -56,6 +56,11 @@ namespace Williams
                 _m31 = row3.y;
                 _m32 = row3.z;
                 _m33 = row3.w;
+
+                _matrixValuesAsArray1D = new float[maxMatrixValues];
+
+                _matrixValuesAsArray2D = new float[maxRows, maxColumns];
+
 
                 SetMatrixArray1D();
 
@@ -110,25 +115,43 @@ namespace Williams
                 }
             }
 
-            public Quaternion rotation //NO TERMINADO
+            public Quaternion rotation 
             {
                 get
                 {
-                    return Quaternion.identity;
+                    return GetRotation();
+                   
                 }
             }
 
-            public Vector3 lossyScale //NO TERMINADO
+            public Vector3 lossyScale 
             {
                 get
                 {
-                    return Vector3.zero;
+                    return GetLocalScale();
                 }
             }
 
-            public static Matrix Rotate(Quaternion quaternion) //NO TERMINADO
+            public static Matrix Rotate(Quaternion q) 
             {
-                return Matrix.Zero;                
+                Vector4 row1 = new Vector4(
+                    1 - 2 * (q.y * q.y) - 2 * (q.z * q.z),
+                    2 * q.x * q.y - 2 * q.w * q.z,
+                    2 * q.x * q.z + 2 * q.w * q.y, 0f);
+
+                Vector4 row2 = new Vector4(
+                    2 * q.x * q.y + 2 * q.w * q.z,
+                    1 - 2 * (q.x * q.x),
+                    2 * q.y * q.z - 2 * q.w * q.x, 0f);
+
+                Vector4 row3 = new Vector4(
+                    2 * q.x * q.z - 2 * q.w * q.y,
+                    2 * q.y * q.z + 2 * q.w * q.x,
+                    1 - 2 * (q.x * q.x) - 2 * (q.y * q.y));
+                
+                Vector4 row4 = new Vector4(0f, 0f, 0f, 1f);
+
+                return new Matrix(row1, row2, row3, row4);                
             }
 
             public static Matrix Scale(Vector3 vector)
@@ -159,6 +182,37 @@ namespace Williams
                     new Vector4(matrix[0, 1], matrix[1, 1], matrix[2, 1], matrix[3, 1]), 
                     new Vector4(matrix[0, 2], matrix[1, 2], matrix[2, 2], matrix[3, 2]), 
                     new Vector4(matrix[0, 3], matrix[1, 3], matrix[2, 3], matrix[3, 3]));
+            }
+
+            public static Matrix TRS(Vector3 pos, Quaternion q, Vector3 s) 
+            {
+                Matrix transformMatrix = Matrix.Translate(pos);                
+                Matrix rotationMatrix = Matrix.Rotate(q);
+                Matrix scaleMatrix = Matrix.Scale(s);
+
+                return transformMatrix * rotationMatrix * scaleMatrix;
+            }
+
+            private Quaternion GetRotation() //NO TERMINADO
+            {
+                /*
+                 Formula 
+                qw = raiz cuadrada (1 + m00 + m11 + m22) / 2
+                qx = (m21 - m12) / (4 * qw)
+                qy = (m02 - m20) / (4 * qw)
+                qz = (m10 - m01) / (4 * qw)    
+                 */
+                float w = Mathf.Sqrt(1 + _m00 + _m11 + _m22) / 2;
+                float x = (_m21 - _m12) / (4 * w);
+                float y = (_m02 - _m20) / (4 * w);
+                float z = (_m10 - _m01) / (4 * w);
+
+                return new Quaternion(x, y, z, w);
+            }
+
+            private Vector3 GetLocalScale() 
+            {
+                return new Vector3(_m00, _m11, _m22);
             }
 
             private void SetMatrixArray1D()
@@ -245,12 +299,7 @@ namespace Williams
                 result[3, 3] = m1[3, 0] * m2[0, 3] + m1[3, 1] * m2[1, 3] + m1[3, 2] * m2[2, 3] + m1[3, 3] * m2[3, 3];
                                 
                 return result;
-            }
-
-            public static Matrix TRS(Vector3 pos, Quaternion q, Vector3 s) //NO TERMINADO 
-            {
-                return Matrix.Zero;
-            }
+            }            
 
             public override bool Equals(object obj)
             {
@@ -264,17 +313,27 @@ namespace Williams
 
             public override string ToString() //NO TERMINADO
             {
-                return base.ToString();
+                string matrix = "[0, 0]" + this[0, 0] + "[0, 1]" + this[0, 1] + "[0, 2]" + this[0, 2] + "[0, 3]" + this[0, 3] 
+                    + "[1, 0]" + this[1, 0] + "[1, 1]" + this[1, 1] + "[1, 2]" + this[1, 2] + "[1, 3]" + this[1, 3] 
+                    + "[2, 0]" + this[2, 0] + "[2, 1]" + this[2, 1] + "[2, 2]" + this[2, 2] + "[2, 3]" + this[2, 3] 
+                    + "[3, 0]" + this[3, 0] + "[3, 1]" + this[3, 1] + "[3, 2]" + this[3, 2] + "[3, 3]" + this[3, 3]; 
+                return matrix;
             }
 
             public static bool operator ==(Matrix m1, Matrix m2) //NO TERMINADO 
             {
-                return true;
+                return m1[0,0] == m2[0, 0] && m1[0, 1] == m2[0, 1] && m1[0, 2] == m2[0, 2] && m1[0, 3] == m2[0, 3] 
+                    && m1[1, 0] == m2[1, 0] && m1[1, 1] == m2[1, 1] && m1[1, 2] == m2[1, 2] && m1[1, 3] == m2[1, 3]
+                    && m1[2, 0] == m2[2, 0] && m1[2, 1] == m2[2, 1] && m1[2, 2] == m2[2, 2] && m1[2, 3] == m2[2, 3]
+                    && m1[3, 0] == m2[3, 0] && m1[3, 1] == m2[3, 1] && m1[3, 2] == m2[3, 2] && m1[3, 3] == m2[3, 3];
             }
             
-            public static bool operator !=(Matrix m1, Matrix m2) //NO TERMINADO
+            public static bool operator !=(Matrix m1, Matrix m2) //NO TERMINADO 
             {
-                return true;
+                return m1[0, 0] != m2[0, 0] || m1[0, 1] != m2[0, 1] || m1[0, 2] != m2[0, 2] || m1[0, 3] != m2[0, 3]
+                     && m1[1, 0] != m2[1, 0] || m1[1, 1] != m2[1, 1] || m1[1, 2] != m2[1, 2] || m1[1, 3] != m2[1, 3]
+                     && m1[2, 0] != m2[2, 0] || m1[2, 1] != m2[2, 1] || m1[2, 2] != m2[2, 2] || m1[2, 3] != m2[2, 3]
+                     && m1[3, 0] != m2[3, 0] || m1[3, 1] != m2[3, 1] || m1[3, 2] != m2[3, 2] || m1[3, 3] != m2[3, 3];
             }
         }
     }
