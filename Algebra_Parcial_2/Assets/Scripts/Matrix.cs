@@ -107,7 +107,7 @@ namespace Williams
                 }
             }
 
-            public Matrix transpose
+            public Matrix transpose     
             {
                 get
                 {

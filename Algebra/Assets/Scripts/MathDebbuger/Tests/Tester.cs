@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MathDebbuger;
-using CustomMath;
+using WilliamsMath;
 public class Tester : MonoBehaviour
 {
     void Start()

@@ -1,8 +1,9 @@
 ﻿using System;
 using UnityEngine;
 
-namespace CustomMath
+namespace WilliamsMath
 {
+    [Serializable]
     public struct Vec3 : IEquatable<Vec3>
     {
         #region Variables
@@ -11,8 +12,10 @@ namespace CustomMath
         public float z;
 
         public float sqrMagnitude { get { return SqrMagnitude(new Vec3(x, y, z)); } }
-        public Vector3 normalized { get { return new Vec3(x, y, z) / Magnitude(new Vec3(x, y , z)); } }
-        public float magnitude { get { return Magnitude(new Vec3(x, y, z)); } }
+        
+        public Vector3 normalized { get { return Normalize(this); } }
+        
+        public float magnitude { get { return Magnitude(this); } }
         #endregion
 
         #region constants
@@ -21,14 +24,23 @@ namespace CustomMath
 
         #region Default Values
         public static Vec3 Zero { get { return new Vec3(0.0f, 0.0f, 0.0f); } }
+
         public static Vec3 One { get { return new Vec3(1.0f, 1.0f, 1.0f); } }
+
         public static Vec3 Forward { get { return new Vec3(0.0f, 0.0f, 1.0f); } }
+
         public static Vec3 Back { get { return new Vec3(0.0f, 0.0f, -1.0f); } }
+
         public static Vec3 Right { get { return new Vec3(1.0f, 0.0f, 0.0f); } }
+
         public static Vec3 Left { get { return new Vec3(-1.0f, 0.0f, 0.0f); } }
+
         public static Vec3 Up { get { return new Vec3(0.0f, 1.0f, 0.0f); } }
+
         public static Vec3 Down { get { return new Vec3(0.0f, -1.0f, 0.0f); } }
+
         public static Vec3 PositiveInfinity { get { return new Vec3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity); } }
+
         public static Vec3 NegativeInfinity { get { return new Vec3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity); } }
         #endregion                                                                                                                                                                               
 
@@ -103,10 +115,12 @@ namespace CustomMath
         {
             return new Vec3(v3.x * scalar, v3.y * scalar, v3.z * scalar);
         }
+
         public static Vec3 operator *(float scalar, Vec3 v3)
         {
             return new Vec3(v3.x * scalar, v3.y * scalar, v3.z * scalar);
         }
+
         public static Vec3 operator /(Vec3 v3, float scalar)
         {
             return new Vec3(v3.x / scalar, v3.y / scalar, v3.z / scalar);
@@ -128,6 +142,7 @@ namespace CustomMath
         {
             return "X = " + x.ToString() + "   Y = " + y.ToString() + "   Z = " + z.ToString();
         }
+        
         public static float Angle(Vec3 from, Vec3 to)
         {
             double dot = Dot(from, to);
@@ -136,37 +151,57 @@ namespace CustomMath
             
             return (float)Math.Acos(dot / (magnitudeOne * magnitudeTwo));
         }
+       
         public static Vec3 ClampMagnitude(Vec3 vector, float maxLength)
-        {           
-            throw new NotImplementedException();
+        {
+            float sqrMagnitude = vector.sqrMagnitude;
+
+            if (sqrMagnitude > maxLength * maxLength)
+            {
+                float sqrt = (float)Math.Sqrt(sqrMagnitude);
+                float newX = vector.x / sqrt;
+                float newY = vector.y / sqrt;
+                float newZ = vector.z / sqrt;
+                return new Vec3(newX * maxLength, newY * maxLength, newZ * maxLength);
+            }
+
+            return vector;
         }
+        
         public static float Magnitude(Vec3 vector)
         {
             return (float)Math.Sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
         }
+        
         public static Vec3 Cross(Vec3 a, Vec3 b)
         {
             return new Vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
         }
+        
         public static float Distance(Vec3 a, Vec3 b)
         {
             Vec3 c = new Vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+
             return (float)Math.Sqrt(c.x * c.x + c.y * c.y + c.z * c.z);
         }
+
         public static float Dot(Vec3 a, Vec3 b)
         {
             return a.x * b.x + a.y * b.y + a.z * b.z;
         }
+
         public static Vec3 Lerp(Vec3 a, Vec3 b, float t)
         {
             Mathf.Clamp(t, 0f, 1f);
 
             return a + (b - a) * t;
         }
+
         public static Vec3 LerpUnclamped(Vec3 a, Vec3 b, float t)
         {
             return a + (b - a) * t;
         }
+
         public static Vec3 Max(Vec3 a, Vec3 b)
         {
             Vec3 maxVec = new Vec3();
@@ -200,6 +235,7 @@ namespace CustomMath
 
             return maxVec;
         }
+
         public static Vec3 Min(Vec3 a, Vec3 b)
         {
             Vec3 minVec = new Vec3();
@@ -233,38 +269,54 @@ namespace CustomMath
 
             return minVec;
         }
+
         public static float SqrMagnitude(Vec3 vector)
         {
             return Dot(vector, vector);
         }
+
+        public static Vec3 Normalize(Vec3 vec3)
+        {
+            return vec3 / Magnitude(vec3);
+        }
+
         public static Vec3 Project(Vec3 vector, Vec3 onNormal) 
         {
-            return (vector * Dot(vector, onNormal) / Dot(onNormal, onNormal));            
+            float dot = Dot(onNormal, onNormal); 
+
+            if (dot < Mathf.Epsilon)
+            {
+                return Zero;
+            }
+
+            float dot2 = Dot(vector, onNormal); 
+            return new Vec3(onNormal.x * dot2 / dot, onNormal.y * dot2 / dot, onNormal.z * dot2 / dot);
         }
+
         public static Vec3 Reflect(Vec3 inDirection, Vec3 inNormal) 
-        {
-            throw new NotImplementedException();
+        {            
+            return -2 * Dot(inNormal, inDirection) * inNormal + inDirection;
         }
+
         public void Set(float newX, float newY, float newZ)
         {
             x = newX;
             y = newY;
             z = newZ;
         }
+
         public void Scale(Vec3 scale)
         {
             x *= scale.x;
             y *= scale.y;
             z *= scale.z;
         }
+
         public void Normalize()
         {
-            float _magnitude = magnitude;
-
-            x /= magnitude;
-            y /= magnitude;
-            z /= magnitude;
+            this /= this.magnitude;           
         }
+
         #endregion
 
         #region Internals

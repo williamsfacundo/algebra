@@ -1,23 +1,24 @@
 using UnityEngine;
 using MathDebbuger;
+using WilliamsMath;
 
-public class Ejercicios_Vector : MonoBehaviour
+public class EjerciciosResueltos : MonoBehaviour
 {
     enum Exercise {ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN };
 
     [SerializeField] private Exercise exercise = Exercise.ONE;
     private Exercise exerciseCopy;
 
-    [SerializeField] private Vector3 vecOne = new Vector3();
-    private Vector3 vecOneCopy;
+    [SerializeField] private Vec3 vecOne = new Vec3();
+    private Vec3 vecOneCopy;
 
-    [SerializeField] private Vector3 vecTwo = new Vector3();
-    private Vector3 vecTwoCopy;
+    [SerializeField] private Vec3 vecTwo = new Vec3();
+    private Vec3 vecTwoCopy;
 
     [SerializeField] private bool enable = true;
     private bool enableCopy;
 
-    private Vector3 vecThree = new Vector3();
+    private Vec3 vecThree = new Vec3();
 
     private Color vecOneColor = Color.red;
     private Color vecTwoColor = Color.blue;
@@ -27,10 +28,12 @@ public class Ejercicios_Vector : MonoBehaviour
     private const string vecTwoName = "VecTwo";
     private const string vecThreeName = "VecThree";
 
+    private float lerpTimer = 0f;
+
     void Start()
     {
         vecOneCopy = vecOne;
-        vecTwoCopy = vecTwo;
+        vecTwoCopy = vecTwo; 
         exerciseCopy = exercise;
         enableCopy = enable;
 
@@ -66,7 +69,17 @@ public class Ejercicios_Vector : MonoBehaviour
         {
             exerciseCopy = exercise;
 
+            if (exercise == Exercise.FIVE)
+            {
+                lerpTimer = 0f;
+            }
+
             UpdateResultingVector();
+        }
+
+        if (exercise == Exercise.FIVE)
+        {
+            UpdateResultingVector();           
         }
     }
 
@@ -77,60 +90,77 @@ public class Ejercicios_Vector : MonoBehaviour
             case Exercise.ONE:
 
                 vecThree = vecOne + vecTwo;
+
                 Vector3Debugger.UpdatePosition(vecThreeName, vecThree);
                 break;
 
             case Exercise.TWO:
 
-                vecThree = Vector3.zero;
+                vecThree = vecOne - vecTwo;
+
                 Vector3Debugger.UpdatePosition(vecThreeName, vecThree);
                 break;
 
             case Exercise.THREE:
 
-                vecThree = Vector3.zero;
+                vecThree = new Vec3(vecOne.x * vecTwo.x, vecOne.y * vecTwo.y, vecOne.z * vecTwo.z);
+
                 Vector3Debugger.UpdatePosition(vecThreeName, vecThree);
                 break;
 
             case Exercise.FOUR:
 
-                vecThree = Vector3.zero;
+                vecThree = Vec3.Cross(vecOne, vecTwo);
+
                 Vector3Debugger.UpdatePosition(vecThreeName, vecThree);
                 break;
 
             case Exercise.FIVE:
 
-                vecThree = Vector3.zero;
+                if (lerpTimer > 1f) 
+                {
+                    lerpTimer = 0f;
+                }                
+
+                lerpTimer += Time.deltaTime;
+
+                vecThree = Vec3.Lerp(vecOne, vecTwo, lerpTimer);
+
                 Vector3Debugger.UpdatePosition(vecThreeName, vecThree);
                 break;
 
             case Exercise.SIX:
 
-                vecThree = Vector3.zero;
+                vecThree = Vec3.Max(vecOne, vecTwo);
+                
                 Vector3Debugger.UpdatePosition(vecThreeName, vecThree);
                 break;
 
             case Exercise.SEVEN:
 
-                vecThree = Vector3.zero;
+                vecThree = Vec3.Project(vecOne, vecTwo);
+                
                 Vector3Debugger.UpdatePosition(vecThreeName, vecThree);
                 break;
 
             case Exercise.EIGHT:
 
-                vecThree = Vector3.zero;
+                vecThree = Vec3.Zero;
+                
                 Vector3Debugger.UpdatePosition(vecThreeName, vecThree);
                 break;
 
             case Exercise.NINE:
 
-                vecThree = Vector3.zero;
+                vecThree = Vec3.Zero;
+                
                 Vector3Debugger.UpdatePosition(vecThreeName, vecThree);
                 break;
 
             case Exercise.TEN:
 
-                vecThree = Vector3.zero;
+                vecThree = Vec3.Zero;
+
                 Vector3Debugger.UpdatePosition(vecThreeName, vecThree);
                 break;
         }
